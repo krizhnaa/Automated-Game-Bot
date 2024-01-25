@@ -12,34 +12,36 @@ driver = webdriver.Chrome(executable_path=chrome_driver_path, options=chrome_opt
 URL = "https://orteil.dashnet.org/experiments/cookie/"
 driver.get(url=URL)
 
-# while True:
-cookie = driver.find_element(By.ID, value="cookie")
-cookie.click()
-
-our_money_str = driver.find_element(By.CSS_SELECTOR, value="#money")
-our_money = int(our_money_str.text)
-# print(our_money)
-
 store_dict = {}
 
-store_monies = driver.find_elements(By.CSS_SELECTOR, value="#store div")
-for item in store_monies[:len(store_monies)-1]:
-    item_id = item.get_attribute("id")
-    # print(item.text)
-    parts1 = item.text.split('-')
-    parts2 = parts1[1].split('\n')
-    store_money = int(parts2[0].replace(',', ''))
-    print(store_money)
+cookie = driver.find_element(By.ID, value="cookie")
 
-    store_dict[item] = {
-        item_id: store_money
-    }
+while True:
+    # cookie.click()
+    our_money_str = driver.find_element(By.CSS_SELECTOR, value="#money")
+    our_money = int(our_money_str.text)
 
-    # if our_money >= store_money:
-    #
-    #
-    # time.sleep(5)
+    store_monies = driver.find_elements(By.CSS_SELECTOR, value="#store div")
+    for item in store_monies[:len(store_monies)-1]:
+        item_id = item.get_attribute("id")
+        parts1 = item.text.split('-')
+        parts2 = parts1[1].split('\n')
+        store_money = int(parts2[0].replace(',', ''))
+        print(store_money)
+        additional_dict = {item_id: store_money}
+        store_dict.update(additional_dict)
 
-print(store_dict)
 
-driver.quit()
+    def get_key_from_value(my_dict, target_value):
+        for key, value in my_dict.items():
+            if target_value >= value:
+                return key
+        # If the value is not found, you might want to handle that case accordingly
+        return None
+
+    print(get_key_from_value(store_dict, our_money))
+    time.sleep(5)
+
+print(store_dict.keys())
+
+# driver.quit()
