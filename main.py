@@ -15,10 +15,15 @@ driver.get(url=URL)
 cookie = driver.find_element(By.ID, value="cookie")
 cookie.click()
 
-our_money = driver.find_element(By.CSS_SELECTOR, value="#money")
-print(our_money.text)
+our_money_str = driver.find_element(By.CSS_SELECTOR, value="#money")
+our_money = int(our_money_str.text)
+print(our_money)
 
-store_monies = driver.find_elements(By.CSS_SELECTOR, value="#store")
-
+store_monies = driver.find_elements(By.CSS_SELECTOR, value="#store b")
+for money in store_monies[:len(store_monies)-1]:
+    parts = money.text.split('-')
+    numeric_value = parts[1].strip()
+    numeric_value = int(numeric_value.replace(',', ''))
+    print(numeric_value)
 
 driver.quit()
