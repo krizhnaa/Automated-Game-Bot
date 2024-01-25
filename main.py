@@ -15,33 +15,45 @@ driver.get(url=URL)
 store_dict = {}
 
 cookie = driver.find_element(By.ID, value="cookie")
+timeout = time.time() + 5
 
 while True:
-    # cookie.click()
-    our_money_str = driver.find_element(By.CSS_SELECTOR, value="#money")
-    our_money = int(our_money_str.text)
+    cookie.click()
+    if time.time() > timeout:
+        our_money_str = driver.find_element(By.CSS_SELECTOR, value="#money")
+        our_money = int(our_money_str.text)
 
-    store_monies = driver.find_elements(By.CSS_SELECTOR, value="#store div")
-    for item in store_monies[:len(store_monies)-1]:
-        item_id = item.get_attribute("id")
-        parts1 = item.text.split('-')
-        parts2 = parts1[1].split('\n')
-        store_money = int(parts2[0].replace(',', ''))
-        print(store_money)
-        additional_dict = {item_id: store_money}
-        store_dict.update(additional_dict)
+        id_list = []
+        store_ids = driver.find_elements(By.CSS_SELECTOR, value="#store div")
+        for ids in store_ids:
+            here = ids.get_attribute("id")
+            id_list.append(here)
 
+        money_list =[]
+        store_monies = driver.find_elements(By.CSS_SELECTOR, value="#store div b")
 
-    def get_key_from_value(my_dict, target_value):
-        for key, value in my_dict.items():
-            if target_value >= value:
-                return key
-        # If the value is not found, you might want to handle that case accordingly
-        return None
+        for item in store_monies:
+            # item_id = item.get_attribute("id")
+            element_text = item.text
+            if element_text != "":
+                store_money = int(element_text.split("-")[1].replace(",", ""))
+                money_list.append(store_money)
 
-    print(get_key_from_value(store_dict, our_money))
-    time.sleep(5)
+        for n in range(len(money_list)):
+            store_dict[money_list[n]] = id_list[n]
 
-print(store_dict.keys())
+        affordable_upgrades = {}
+        for cost, id in store_dict.items():
+            if our_money > cost:
+                affordable_upgrades[cost] = id
+
+        highest_price_affordable_upgrade = max(affordable_upgrades)
+        print(highest_price_affordable_upgrade)
+        to_purchase_id = affordable_upgrades[highest_price_affordable_upgrade]
+
+        driver.find_element(by=By.ID, value=to_purchase_id).click()
+        timeout = time.time() + 5
+        # time.sleep(5)
+
 
 # driver.quit()
